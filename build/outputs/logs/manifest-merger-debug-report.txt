@@ -1,0 +1,79 @@
+-- Merging decision tree log ---
+manifest
+ADDED from C:\Users\ssebast\Downloads\Microsoft Band SDK and Samples for Android\BandTileEventApp\AndroidManifest.xml:2:1-47:12
+	xmlns:android
+		ADDED from C:\Users\ssebast\Downloads\Microsoft Band SDK and Samples for Android\BandTileEventApp\AndroidManifest.xml:2:11-69
+	package
+		ADDED from C:\Users\ssebast\Downloads\Microsoft Band SDK and Samples for Android\BandTileEventApp\AndroidManifest.xml:3:5-57
+	android:versionName
+		ADDED from C:\Users\ssebast\Downloads\Microsoft Band SDK and Samples for Android\BandTileEventApp\AndroidManifest.xml:5:5-30
+	android:versionCode
+		ADDED from C:\Users\ssebast\Downloads\Microsoft Band SDK and Samples for Android\BandTileEventApp\AndroidManifest.xml:4:5-28
+		INJECTED from C:\Users\ssebast\Downloads\Microsoft Band SDK and Samples for Android\BandTileEventApp\AndroidManifest.xml
+		INJECTED from C:\Users\ssebast\Downloads\Microsoft Band SDK and Samples for Android\BandTileEventApp\AndroidManifest.xml
+uses-sdk
+ADDED from C:\Users\ssebast\Downloads\Microsoft Band SDK and Samples for Android\BandTileEventApp\AndroidManifest.xml:7:5-9:41
+	android:targetSdkVersion
+		ADDED from C:\Users\ssebast\Downloads\Microsoft Band SDK and Samples for Android\BandTileEventApp\AndroidManifest.xml:9:9-38
+	android:minSdkVersion
+		ADDED from C:\Users\ssebast\Downloads\Microsoft Band SDK and Samples for Android\BandTileEventApp\AndroidManifest.xml:8:9-35
+uses-permission#android.permission.BLUETOOTH
+ADDED from C:\Users\ssebast\Downloads\Microsoft Band SDK and Samples for Android\BandTileEventApp\AndroidManifest.xml:11:5-68
+	android:name
+		ADDED from C:\Users\ssebast\Downloads\Microsoft Band SDK and Samples for Android\BandTileEventApp\AndroidManifest.xml:11:22-65
+uses-permission#com.microsoft.band.service.access.BIND_BAND_SERVICE
+ADDED from C:\Users\ssebast\Downloads\Microsoft Band SDK and Samples for Android\BandTileEventApp\AndroidManifest.xml:12:5-91
+	android:name
+		ADDED from C:\Users\ssebast\Downloads\Microsoft Band SDK and Samples for Android\BandTileEventApp\AndroidManifest.xml:12:22-88
+application
+ADDED from C:\Users\ssebast\Downloads\Microsoft Band SDK and Samples for Android\BandTileEventApp\AndroidManifest.xml:15:5-45:19
+	android:label
+		ADDED from C:\Users\ssebast\Downloads\Microsoft Band SDK and Samples for Android\BandTileEventApp\AndroidManifest.xml:18:9-41
+	android:allowBackup
+		ADDED from C:\Users\ssebast\Downloads\Microsoft Band SDK and Samples for Android\BandTileEventApp\AndroidManifest.xml:16:9-35
+	android:icon
+		ADDED from C:\Users\ssebast\Downloads\Microsoft Band SDK and Samples for Android\BandTileEventApp\AndroidManifest.xml:17:9-45
+	android:theme
+		ADDED from C:\Users\ssebast\Downloads\Microsoft Band SDK and Samples for Android\BandTileEventApp\AndroidManifest.xml:19:9-40
+activity#com.microsoft.band.sdk.sampleapp.BandTileEventAppActivity
+ADDED from C:\Users\ssebast\Downloads\Microsoft Band SDK and Samples for Android\BandTileEventApp\AndroidManifest.xml:20:9-29:20
+	android:label
+		ADDED from C:\Users\ssebast\Downloads\Microsoft Band SDK and Samples for Android\BandTileEventApp\AndroidManifest.xml:23:13-45
+	android:configChanges
+		ADDED from C:\Users\ssebast\Downloads\Microsoft Band SDK and Samples for Android\BandTileEventApp\AndroidManifest.xml:22:13-74
+	android:name
+		ADDED from C:\Users\ssebast\Downloads\Microsoft Band SDK and Samples for Android\BandTileEventApp\AndroidManifest.xml:21:13-85
+intent-filter#android.intent.action.MAIN+android.intent.category.LAUNCHER
+ADDED from C:\Users\ssebast\Downloads\Microsoft Band SDK and Samples for Android\BandTileEventApp\AndroidManifest.xml:24:13-28:29
+action#android.intent.action.MAIN
+ADDED from C:\Users\ssebast\Downloads\Microsoft Band SDK and Samples for Android\BandTileEventApp\AndroidManifest.xml:25:17-69
+	android:name
+		ADDED from C:\Users\ssebast\Downloads\Microsoft Band SDK and Samples for Android\BandTileEventApp\AndroidManifest.xml:25:25-66
+category#android.intent.category.LAUNCHER
+ADDED from C:\Users\ssebast\Downloads\Microsoft Band SDK and Samples for Android\BandTileEventApp\AndroidManifest.xml:27:17-77
+	android:name
+		ADDED from C:\Users\ssebast\Downloads\Microsoft Band SDK and Samples for Android\BandTileEventApp\AndroidManifest.xml:27:27-74
+receiver#com.microsoft.band.sdk.sampleapp.TileEventReceiver
+ADDED from C:\Users\ssebast\Downloads\Microsoft Band SDK and Samples for Android\BandTileEventApp\AndroidManifest.xml:34:9-44:20
+	android:label
+		ADDED from C:\Users\ssebast\Downloads\Microsoft Band SDK and Samples for Android\BandTileEventApp\AndroidManifest.xml:36:13-45
+	android:exported
+		ADDED from C:\Users\ssebast\Downloads\Microsoft Band SDK and Samples for Android\BandTileEventApp\AndroidManifest.xml:38:13-36
+	android:enabled
+		ADDED from C:\Users\ssebast\Downloads\Microsoft Band SDK and Samples for Android\BandTileEventApp\AndroidManifest.xml:37:13-35
+	android:name
+		ADDED from C:\Users\ssebast\Downloads\Microsoft Band SDK and Samples for Android\BandTileEventApp\AndroidManifest.xml:35:13-78
+intent-filter#com.microsoft.band.action.ACTION_TILE_BUTTON_PRESSED+com.microsoft.band.action.ACTION_TILE_CLOSED+com.microsoft.band.action.ACTION_TILE_OPENED
+ADDED from C:\Users\ssebast\Downloads\Microsoft Band SDK and Samples for Android\BandTileEventApp\AndroidManifest.xml:39:13-43:29
+action#com.microsoft.band.action.ACTION_TILE_OPENED
+ADDED from C:\Users\ssebast\Downloads\Microsoft Band SDK and Samples for Android\BandTileEventApp\AndroidManifest.xml:40:17-86
+	android:name
+		ADDED from C:\Users\ssebast\Downloads\Microsoft Band SDK and Samples for Android\BandTileEventApp\AndroidManifest.xml:40:25-84
+action#com.microsoft.band.action.ACTION_TILE_BUTTON_PRESSED
+ADDED from C:\Users\ssebast\Downloads\Microsoft Band SDK and Samples for Android\BandTileEventApp\AndroidManifest.xml:41:17-94
+	android:name
+		ADDED from C:\Users\ssebast\Downloads\Microsoft Band SDK and Samples for Android\BandTileEventApp\AndroidManifest.xml:41:25-92
+action#com.microsoft.band.action.ACTION_TILE_CLOSED
+ADDED from C:\Users\ssebast\Downloads\Microsoft Band SDK and Samples for Android\BandTileEventApp\AndroidManifest.xml:42:17-86
+	android:name
+		ADDED from C:\Users\ssebast\Downloads\Microsoft Band SDK and Samples for Android\BandTileEventApp\AndroidManifest.xml:42:25-84
