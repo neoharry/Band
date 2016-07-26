@@ -1,0 +1,9 @@
+## Ignore Android Studio temporary files, build results
+
+# User-specific files
+*.idea/
+.gradle/
+
+# Build results
+build/
+
