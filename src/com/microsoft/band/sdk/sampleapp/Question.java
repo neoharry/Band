@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Created by shakerk on 7/26/2016.
@@ -83,8 +84,11 @@ public class Question {
     
     public static Question getAQuestion()
     {
-        Question q = questions.get(counter);
-        counter++;
+        Random random = new Random(System.currentTimeMillis());
+        int randomNumber = random.nextInt(questions.size());
+        Log.d("getAQuestion", String.valueOf(randomNumber));
+        Question q = questions.get(randomNumber);
+        //counter++;
         return q;
     }
 
