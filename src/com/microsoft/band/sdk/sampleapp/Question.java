@@ -45,7 +45,7 @@ public class Question {
     private Category category;
     private String[] tags;
 
-    private static int counter;
+    private static int counter = 0;
     private static List<Question> questions = new ArrayList<Question>();
 
     private Question(int id, String question, String[] options, String correctAnswer, String message, Level level, Category category, String[] tags) {
@@ -86,6 +86,22 @@ public class Question {
         Question q = questions.get(counter);
         counter++;
         return q;
+    }
+
+    public String getQuestionTitle() {
+        return this.question;
+    }
+
+    public String[] getOptions() {
+        return this.options;
+    }
+
+    public String getCorrectAnswer() {
+        return this.correctAnswer;
+    }
+
+    public String getMessage() {
+        return this.message;
     }
 
     private static void parseQuestionFromInput(String[] input) {

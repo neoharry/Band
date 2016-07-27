@@ -72,28 +72,6 @@ import com.microsoft.band.tiles.pages.WrappedTextBlockFont;
 
 public class BandTileEventAppActivity extends Activity {
 
-    static class QuestionDB
-    {
-        String questionTitle;
-        String[] options;
-        int correctAnswer;
-        String message;
-
-        public QuestionDB(String questionTitle, String[] options, int correctAnswer, String message)
-        {
-            this.questionTitle = questionTitle;
-            this.options = options;
-            this.correctAnswer = correctAnswer;
-            this.message = message;
-        }
-    }
-
-    private static QuestionDB[] list = {
-        new QuestionDB("Microsoft was founded by",new String[]{"Bill Gates", "Steve Jobs"}, 1, "Bill Gates founded Microsoft in 1974"),
-        new QuestionDB("Marvel created the character",new String[]{"Batman", "IronMan"}, 0, "Stan Lee from Marvel comics created IronMan"),
-        new QuestionDB("Space needle was built in the century",new String[]{"19th", "20th"}, 1, "Engineer Sachin constructed Space Needle in 19th century and was completed in 2 years"),
-    };
-
     private static final UUID tileId = UUID.fromString("cc0D508F-70A3-47D4-BBA3-812BADB1F8Aa");
     private static final UUID homePageId = UUID.fromString("b1234567-89ab-cdef-0123-456789abcd03");
     private static final UUID questionPageId = UUID.fromString("b1234567-89ab-cdef-0123-456789abcd00");
@@ -105,6 +83,8 @@ public class BandTileEventAppActivity extends Activity {
 	private Button btnStart;
 	private TextView txtStatus;
 	private ScrollView scrollView;
+
+    private Question q;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -352,6 +332,7 @@ public class BandTileEventAppActivity extends Activity {
 
     private void createQuestion()
     {
+        Question.generateQuestions(getBaseContext());
         try {
             if (currentIndex >= 3 || currentIndex < 0)
             {
@@ -390,22 +371,25 @@ public class BandTileEventAppActivity extends Activity {
 	}
 	
 	private void updatePages() throws BandIOException {
+		q = Question.getAQuestion();
+		String[] options = q.getOptions();
         client.getTileManager().setPages(tileId,
                 new PageData(questionPageId, 1)
-                        .update(new WrappedTextBlockData(1, list[currentIndex].questionTitle))
-                        .update(new TextButtonData(12, list[currentIndex].options[0]))
-                        .update(new TextButtonData(21, list[currentIndex].options[1])));
+                        .update(new WrappedTextBlockData(1, q.getQuestionTitle()))
+                        .update(new TextButtonData(12, options[0]))
+                        .update(new TextButtonData(21, options[1])));
 	}
 
     private void OnAnswered(UUID pageId, Boolean isCorrect) throws BandException, InterruptedException {
         String message = (isCorrect?"Correct!!":"Wrong :(");
-        message += "\n" + list[currentIndex].message;
+        message += "\n" + q.getMessage();
+        String[] options = q.getOptions();
 
         client.getTileManager().setPages(tileId,
                 new PageData(pageId, 1)
                         .update(new WrappedTextBlockData(1, message))
-                        .update(new TextButtonData(12, list[currentIndex].options[0]))
-                        .update(new TextButtonData(21, list[currentIndex].options[1])));
+                        .update(new TextButtonData(12, options[0]))
+                        .update(new TextButtonData(21, options[1])));
 
         if (isCorrect)
         {
