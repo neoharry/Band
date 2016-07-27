@@ -5,6 +5,7 @@
 .gradle/
 
 # Build results
-build/
+[Bb]uild/
+[Bb]uild/generated
 
 Band.iml
