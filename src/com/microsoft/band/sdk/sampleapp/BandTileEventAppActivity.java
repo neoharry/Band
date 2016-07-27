@@ -169,6 +169,7 @@ public class BandTileEventAppActivity extends Activity {
                         else
                         {
                             OnAnswered(buttonData.getPageID(), buttonData.getElementID() == 21);
+
                         }
                     }
                     catch (BandException e){} catch (InterruptedException e) {
@@ -352,8 +353,9 @@ public class BandTileEventAppActivity extends Activity {
     private PageLayout createOneButtonLayout()
     {
         TextButton button1 = new TextButton(0, 5, 100, 45).setMargins(0, 5, 0, 0).setId(99).setPressedColor(Color.YELLOW);
+
         return new PageLayout(
-                new ScrollFlowPanel(0, 0, 245, 1300, FlowPanelOrientation.VERTICAL).setHorizontalAlignment(HorizontalAlignment.CENTER).setVerticalAlignment(VerticalAlignment.TOP)
+                new ScrollFlowPanel(0, 0, 245, 100, FlowPanelOrientation.VERTICAL).setHorizontalAlignment(HorizontalAlignment.CENTER).setVerticalAlignment(VerticalAlignment.TOP)
                         .addElements(
                                 new WrappedTextBlock(0, 0, 245, 202, WrappedTextBlockFont.SMALL).setId(1).setColor(Color.CYAN).setAutoHeightEnabled(true),
                                 new TextBlock(0,0,245, 50, TextBlockFont.SMALL).setId(2).setColor(Color.YELLOW).setAutoWidthEnabled(true),
@@ -364,7 +366,7 @@ public class BandTileEventAppActivity extends Activity {
         TextButton button1 = new TextButton(0, 5, 100, 45).setMargins(0, 5, 0, 0).setId(12).setPressedColor(Color.GRAY);
         TextButton button2 = new TextButton(0, 0, 100, 45).setMargins(5, 5, 0, 0).setId(21).setPressedColor(Color.GRAY);
 		return new PageLayout(
-				new ScrollFlowPanel(0, 0, 245, 1300, FlowPanelOrientation.VERTICAL).setHorizontalAlignment(HorizontalAlignment.LEFT).setVerticalAlignment(VerticalAlignment.TOP)
+				new ScrollFlowPanel(0, 0, 245, 100, FlowPanelOrientation.VERTICAL).setHorizontalAlignment(HorizontalAlignment.LEFT).setVerticalAlignment(VerticalAlignment.TOP)
 					.addElements(
                             new WrappedTextBlock(0, 0, 245, 202, WrappedTextBlockFont.SMALL).setId(1).setColor(Color.WHITE).setAutoHeightEnabled(true),
                             new FlowPanel(0,0,220,100,FlowPanelOrientation.HORIZONTAL).addElements(button1).addElements(button2)));
