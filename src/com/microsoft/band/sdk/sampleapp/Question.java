@@ -67,23 +67,15 @@ public class Question {
             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
             String line;
             while ((line = bufferedReader.readLine()) != null) {
-                /*
-                Id,Question,Options,Correct Answer,Message,Level,Category,Tags
-                1,When did second world war end?,1939; 1945,1945,Second world war ended in 1945.,Easy,History,War
-                 */
                 String[] input = line.split(",");
                 parseQuestionFromInput(input);
             }
         } catch (IOException e) {
-
+            Log.e("generateQuestions", e.getMessage());
         }
-        /*questions = {
-               new Question(1, "When did second world war end?", new String[] {"1939", "1945"}, 1, "Second world war ended in 1945.", Level.Easy, Category.History, new String[] {"second world war"}),
-        };*/
     }
     
-    public static Question getAQuestion()
-    {
+    public static Question getAQuestion() {
         Random random = new Random(System.currentTimeMillis());
         int randomNumber = random.nextInt(questions.size());
         Log.d("getAQuestion", String.valueOf(randomNumber));
@@ -108,10 +100,18 @@ public class Question {
         return this.message;
     }
 
+    public Boolean checkAnswer(int optionIndex) {
+        return getCorrectAnswer().equalsIgnoreCase(getOptions()[optionIndex]);
+    }
+
     private static void parseQuestionFromInput(String[] input) {
         if (input != null && input.length != 8) {
             Log.e("parseQuestionFromInput", "Invalid input");
         } else {
+            /*
+                Id,Question,Options,Correct Answer,Message,Level,Category,Tags
+                1,When did second world war end?,1939; 1945,1945,Second world war ended in 1945.,Easy,History,War
+            */
             String[] options = input[2].split(";");
             String[] tags = input[7].split(";");
             Question q = new Question(Integer.parseInt(input[0]), /* id */
@@ -125,11 +125,6 @@ public class Question {
             );
             questions.add(q);
         }
-    }
-
-    public Boolean CheckAnswer(int optionIndex)
-    {
-        return getCorrectAnswer().equalsIgnoreCase(getOptions()[optionIndex]);
     }
 }
 

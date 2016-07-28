@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.util.Log;
 
 import com.microsoft.band.BandClient;
 import com.microsoft.band.BandClientManager;
@@ -12,6 +13,8 @@ import com.microsoft.band.BandIOException;
 import com.microsoft.band.BandInfo;
 import com.microsoft.band.ConnectionState;
 import com.microsoft.band.sdk.sampleapp.tileevent.R;
+import com.microsoft.band.sensors.BandPedometerEvent;
+import com.microsoft.band.sensors.BandPedometerEventListener;
 import com.microsoft.band.tiles.BandTile;
 import com.microsoft.band.tiles.TileButtonEvent;
 import com.microsoft.band.tiles.pages.FlowPanel;
@@ -49,6 +52,8 @@ public class PageManager{
     private int homeMessageId= 7;
     private int healthIconIdStart = 100; // Do Not add 100+health for any other element
 
+    private long firstStep = -1;
+
     private static final int MAX_HEALTH = 2;
     private static int health = MAX_HEALTH;
 
@@ -84,6 +89,7 @@ public class PageManager{
                 data.update(new IconData(healthIconIdStart+i,0));
             }
             client.getTileManager().setPages(tileId, data);
+
         } catch (BandIOException e) {
             e.printStackTrace();
         }
@@ -110,7 +116,9 @@ public class PageManager{
         if (doesTileExist()) {
             return true;
         }
+        Question.generateQuestions(context);
 
+        client.getSensorManager().registerPedometerEventListener(mPedometerEventListener);
 		/* Set the options */
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inScaled = false;
@@ -133,7 +141,6 @@ public class PageManager{
 
     public void createQuestion()
     {
-        Question.generateQuestions(context);
         try {
             if (health <= 0)
             {
@@ -239,13 +246,41 @@ public class PageManager{
         else
         {
             try {
-                OnAnswered(buttonData.getPageID(), q.CheckAnswer(buttonData.getElementID() == optionLeftId ? 0 : 1));
+                OnAnswered(buttonData.getPageID(), q.checkAnswer(buttonData.getElementID() == optionLeftId ? 0 : 1));
             } catch (BandException e) {
                 e.printStackTrace();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
 
+        }
+    }
+    private BandPedometerEventListener mPedometerEventListener = new BandPedometerEventListener() {
+        @Override
+        public void onBandPedometerChanged(final BandPedometerEvent event) {
+            if (event != null) {
+                if (firstStep < 0) {
+                    firstStep = event.getTotalSteps();
+                    Log.d("Pedometer", String.valueOf(event.getTotalSteps()));
+                }
+                if (event.getTotalSteps() - firstStep > 5) {
+                    firstStep = -1;
+                    UnregisterPedometer();
+                    UpdateHealth(2);
+
+                }
+
+            }
+        }
+    };
+
+    public void UnregisterPedometer() {
+        if (client != null) {
+            try {
+                client.getSensorManager().unregisterPedometerEventListener(mPedometerEventListener);
+            } catch (BandIOException e) {
+                //appendToUI(e.getMessage());
+            }
         }
     }
 
