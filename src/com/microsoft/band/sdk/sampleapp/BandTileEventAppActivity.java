@@ -158,22 +158,8 @@ public class BandTileEventAppActivity extends Activity {
 				appendToUI("Tile open event received\n" + tileOpenData.toString() + "\n\n");
 			} else if (intent.getAction() == TileEvent.ACTION_TILE_BUTTON_PRESSED) {
 				TileButtonEvent buttonData = intent.getParcelableExtra(TileEvent.TILE_EVENT_DATA);
-                try {
-                        if (buttonData.getElementID() == 99)
-                        {
-                            //Play Pressed
-                            pageManager.createQuestion();
-                        }
-                        else
-                        {
-                            pageManager.OnAnswered(buttonData.getPageID(), buttonData.getElementID() == 21);
-
-                        }
-                    }
-                    catch (BandException e){} catch (InterruptedException e) {
-                }
-
-                    appendToUI("Button 1 Pressed\n\n");
+				pageManager.OnButtonClicked(buttonData);
+				appendToUI("Button 1 Pressed\n\n");
 			} else if (intent.getAction() == TileEvent.ACTION_TILE_CLOSED) {
 				TileEvent tileCloseData = intent.getParcelableExtra(TileEvent.TILE_EVENT_DATA);
 				appendToUI("Tile close event received\n" + tileCloseData.toString() + "\n\n");

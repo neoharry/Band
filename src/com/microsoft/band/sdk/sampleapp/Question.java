@@ -126,6 +126,11 @@ public class Question {
             questions.add(q);
         }
     }
+
+    public Boolean CheckAnswer(int optionIndex)
+    {
+        return getCorrectAnswer().equalsIgnoreCase(getOptions()[optionIndex]);
+    }
 }
 
 

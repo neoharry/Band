@@ -1,6 +1,5 @@
 package com.microsoft.band.sdk.sampleapp;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -14,14 +13,15 @@ import com.microsoft.band.BandInfo;
 import com.microsoft.band.ConnectionState;
 import com.microsoft.band.sdk.sampleapp.tileevent.R;
 import com.microsoft.band.tiles.BandTile;
+import com.microsoft.band.tiles.TileButtonEvent;
 import com.microsoft.band.tiles.pages.FlowPanel;
 import com.microsoft.band.tiles.pages.FlowPanelOrientation;
 import com.microsoft.band.tiles.pages.HorizontalAlignment;
+import com.microsoft.band.tiles.pages.Icon;
+import com.microsoft.band.tiles.pages.IconData;
 import com.microsoft.band.tiles.pages.PageData;
 import com.microsoft.band.tiles.pages.PageLayout;
 import com.microsoft.band.tiles.pages.ScrollFlowPanel;
-import com.microsoft.band.tiles.pages.TextBlock;
-import com.microsoft.band.tiles.pages.TextBlockFont;
 import com.microsoft.band.tiles.pages.TextButton;
 import com.microsoft.band.tiles.pages.TextButtonData;
 import com.microsoft.band.tiles.pages.VerticalAlignment;
@@ -40,7 +40,17 @@ public class PageManager{
     private static final UUID homePageId = UUID.fromString("b1234567-89ab-cdef-0123-456789abcd03");
     private static final UUID questionPageId = UUID.fromString("b1234567-89ab-cdef-0123-456789abcd00");
 
-    private static int health = 2;
+    private int optionLeftId = 1;
+    private int optionRightId = 2;
+    private int skipButtonId = 3;
+    private int playButtonId = 4;
+    private int homeStatusId = 5;
+    private int questionTextId = 6;
+    private int homeMessageId= 7;
+    private int healthIconIdStart = 100; // Do Not add 100+health for any other element
+
+    private static final int MAX_HEALTH = 2;
+    private static int health = MAX_HEALTH;
 
     private BandClient client = null;
     private Question q;
@@ -53,13 +63,27 @@ public class PageManager{
         this.context = context;
     }
 
+    public String GetHomeMessage()
+    {
+        if (health <=0 ) return "Run 500 mts for fuel-up";
+
+        return "";
+    }
+
     public void createHomeView() {
         try {
             client.getTileManager().removePages(tileId);
-            client.getTileManager().setPages(tileId,
-                    new PageData(homePageId, 0)
-                            .update(new WrappedTextBlockData(1, "Lives: " + health))
-                            .update(new TextButtonData(99, "Play")));
+
+            PageData data = new PageData(homePageId, 0)
+                    .update(new WrappedTextBlockData(homeStatusId, "Lives: " + health))
+                    .update(new WrappedTextBlockData(homeMessageId, GetHomeMessage()))
+                    .update(new TextButtonData(playButtonId, "Play"));
+
+            for (int i = 0; i < health; i++)
+            {
+                data.update(new IconData(healthIconIdStart+i,0));
+            }
+            client.getTileManager().setPages(tileId, data);
         } catch (BandIOException e) {
             e.printStackTrace();
         }
@@ -94,7 +118,8 @@ public class PageManager{
         Bitmap tileIcon = BitmapFactory.decodeResource(context.getResources(), R.raw.b_icon, options);
 
         BandTile tile = new BandTile.Builder(tileId, "Button Tile", tileIcon)
-                .setPageLayouts(createOneButtonLayout(), createButtonLayout())
+                .setPageLayouts(CreateHomeLayout(), CreateQuestionLayout())
+                .setPageIcons(tileIcon)
                 .build();
         //appendToUI("Button Tile is adding ...\n");
         if (client.getTileManager().addTile(activity, tile).await()) {
@@ -110,7 +135,7 @@ public class PageManager{
     {
         Question.generateQuestions(context);
         try {
-            if (currentIndex >= 3 || currentIndex < 0)
+            if (health <= 0)
             {
                 //Purge all pages if any
                 createHomeView();
@@ -125,26 +150,38 @@ public class PageManager{
         {}
     }
 
-    private PageLayout createOneButtonLayout()
+    private PageLayout CreateHomeLayout()
     {
-        TextButton button1 = new TextButton(0, 5, 100, 45).setMargins(0, 5, 0, 0).setId(99).setPressedColor(Color.YELLOW);
+        TextButton button1 = new TextButton(0, 5, 100, 45).setMargins(0, 5, 0, 0).setId(playButtonId).setPressedColor(Color.YELLOW);
+
+        FlowPanel healthIndicator = new FlowPanel(0, 0, 245, 30, FlowPanelOrientation.HORIZONTAL);
+        for (int i = 0; i < MAX_HEALTH; i++)
+        {
+            Icon icon = new Icon(0, 0, 25, 25).setId(healthIconIdStart + i);
+            healthIndicator.addElements(icon);
+        }
 
         return new PageLayout(
                 new ScrollFlowPanel(0, 0, 245, 100, FlowPanelOrientation.VERTICAL).setHorizontalAlignment(HorizontalAlignment.CENTER).setVerticalAlignment(VerticalAlignment.TOP)
                         .addElements(
-                                new WrappedTextBlock(0, 0, 245, 202, WrappedTextBlockFont.SMALL).setId(1).setColor(Color.CYAN).setAutoHeightEnabled(true),
-                                new TextBlock(0,0,245, 50, TextBlockFont.SMALL).setId(2).setColor(Color.YELLOW).setAutoWidthEnabled(true),
+                                healthIndicator,
+                                new WrappedTextBlock(0, 0, 245, 202, WrappedTextBlockFont.SMALL).setId(homeStatusId).setColor(Color.GREEN).setAutoHeightEnabled(true),
+                                new WrappedTextBlock(0, 0, 245, 202, WrappedTextBlockFont.SMALL).setId(homeMessageId).setColor(Color.YELLOW).setAutoHeightEnabled(true),
                                 new FlowPanel(0,0,100,45,FlowPanelOrientation.HORIZONTAL).addElements(button1).setHorizontalAlignment(HorizontalAlignment.CENTER)));
     }
 
-    private PageLayout createButtonLayout() {
-        TextButton button1 = new TextButton(0, 5, 100, 45).setMargins(0, 5, 0, 0).setId(12).setPressedColor(Color.GRAY);
-        TextButton button2 = new TextButton(0, 0, 100, 45).setMargins(5, 5, 0, 0).setId(21).setPressedColor(Color.GRAY);
+    private PageLayout CreateQuestionLayout() {
+        TextButton button1 = new TextButton(0, 5, 245, 45).setMargins(0, 15, 0, 0).setId(optionLeftId).setPressedColor(Color.GRAY).setHorizontalAlignment(HorizontalAlignment.CENTER);
+        TextButton button2 = new TextButton(0, 0, 245, 45).setMargins(0, 15, 0, 0).setId(optionRightId).setPressedColor(Color.GRAY).setHorizontalAlignment(HorizontalAlignment.CENTER);
+
+        TextButton skipButton = new TextButton(0, 0, 100, 45).setMargins(115, 15, 0, 0).setId(skipButtonId).setPressedColor(Color.GRAY).setHorizontalAlignment(HorizontalAlignment.CENTER);
+
         return new PageLayout(
                 new ScrollFlowPanel(0, 0, 245, 100, FlowPanelOrientation.VERTICAL).setHorizontalAlignment(HorizontalAlignment.LEFT).setVerticalAlignment(VerticalAlignment.TOP)
                         .addElements(
-                                new WrappedTextBlock(0, 0, 245, 202, WrappedTextBlockFont.SMALL).setId(1).setColor(Color.WHITE).setAutoHeightEnabled(true),
-                                new FlowPanel(0,0,220,100,FlowPanelOrientation.HORIZONTAL).addElements(button1).addElements(button2)));
+                                new WrappedTextBlock(0, 0, 245, 202, WrappedTextBlockFont.SMALL).setId(questionTextId).setColor(Color.WHITE).setAutoHeightEnabled(true),
+                                new FlowPanel(0,0,245,120,FlowPanelOrientation.VERTICAL).addElements(button1, button2).setHorizontalAlignment(HorizontalAlignment.CENTER),
+                                skipButton));
     }
 
     public void updatePages() throws BandIOException {
@@ -152,9 +189,17 @@ public class PageManager{
         String[] options = q.getOptions();
         client.getTileManager().setPages(tileId,
                 new PageData(questionPageId, 1)
-                        .update(new WrappedTextBlockData(1, q.getQuestionTitle()))
-                        .update(new TextButtonData(12, options[0]))
-                        .update(new TextButtonData(21, options[1])));
+                        .update(new WrappedTextBlockData(questionTextId, q.getQuestionTitle()))
+                        .update(new TextButtonData(optionLeftId, options[0]))
+                        .update(new TextButtonData(optionRightId, options[1]))
+                        .update(new TextButtonData(skipButtonId, "Next")));
+    }
+
+    private void UpdateHealth(int newValue)
+    {
+        if (newValue < 0 || newValue > MAX_HEALTH)
+            return;
+        health = newValue;
     }
 
     public void OnAnswered(UUID pageId, Boolean isCorrect) throws BandException, InterruptedException {
@@ -164,24 +209,44 @@ public class PageManager{
 
         client.getTileManager().setPages(tileId,
                 new PageData(pageId, 1)
-                        .update(new WrappedTextBlockData(1, message))
-                        .update(new TextButtonData(12, options[0]))
-                        .update(new TextButtonData(21, options[1])));
+                        .update(new WrappedTextBlockData(questionTextId, message))
+                        .update(new TextButtonData(optionLeftId, options[0]))
+                        .update(new TextButtonData(optionRightId, options[1]))
+                        .update(new TextButtonData(skipButtonId, "Next")));
 
         if (isCorrect)
         {
-            health++;
-            if (health > 2) health = 2;
+            UpdateHealth(health+1);
         }
         else
         {
-            health--;
-            if (health < 1) return ;
+            UpdateHealth(health-1);
         }
-        currentIndex++;
+    }
 
-        Thread.sleep(3000);
-        createQuestion();
+    public void OnButtonClicked(TileButtonEvent buttonData)
+    {
+        if (buttonData.getElementID() == playButtonId)
+        {
+            //Play Pressed
+            createQuestion();
+        }
+        else if (buttonData.getElementID() == skipButtonId)
+        {
+            UpdateHealth(health-1);
+            createQuestion();
+        }
+        else
+        {
+            try {
+                OnAnswered(buttonData.getPageID(), q.CheckAnswer(buttonData.getElementID() == optionLeftId ? 0 : 1));
+            } catch (BandException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+        }
     }
 
     public boolean getConnectedBandClient() throws InterruptedException, BandException {
