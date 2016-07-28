@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- From: file:/C:/Users/ssebast/Downloads/Microsoft%20Band%20SDK%20and%20Samples%20for%20Android/BandTileEventApp/res/values/dimens.xml -->
-    <eat-comment/>
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
-    <!-- From: file:/C:/Users/ssebast/Downloads/Microsoft%20Band%20SDK%20and%20Samples%20for%20Android/BandTileEventApp/res/values/strings.xml -->
-    <eat-comment/>
     <string name="action_settings">Settings</string>
     <string name="app_name">Band Tile Event App</string>
     <string name="hello_world">Hello world!</string>
@@ -21,8 +17,6 @@
         6. Enter the tile and test the buttons\n
         7. Press the Stop button to end the demo and remove the tile.</string>
     <string name="stop">Stop</string>
-    <!-- From: file:/C:/Users/ssebast/Downloads/Microsoft%20Band%20SDK%20and%20Samples%20for%20Android/BandTileEventApp/res/values/styles.xml -->
-    <eat-comment/>
     <style name="AppBaseTheme" parent="android:Theme.Light">
         <!--
             Theme customizations available in newer API levels can go in

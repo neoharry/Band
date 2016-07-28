@@ -72,19 +72,14 @@ import com.microsoft.band.tiles.pages.WrappedTextBlockFont;
 
 public class BandTileEventAppActivity extends Activity {
 
-    private static final UUID tileId = UUID.fromString("cc0D508F-70A3-47D4-BBA3-812BADB1F8Aa");
-    private static final UUID homePageId = UUID.fromString("b1234567-89ab-cdef-0123-456789abcd03");
-    private static final UUID questionPageId = UUID.fromString("b1234567-89ab-cdef-0123-456789abcd00");
-
     private static int currentIndex = 0;
-    private static int health = 2;
 	private BandClient client = null;
 	private Button btnStop;
 	private Button btnStart;
 	private TextView txtStatus;
 	private ScrollView scrollView;
 
-    private Question q;
+	private PageManager pageManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,8 +104,11 @@ public class BandTileEventAppActivity extends Activity {
 			public void onClick(View v) {
 				disableButtons();
 				new StopTask().execute();
-    }
+			}
 		});
+
+		pageManager = new PageManager(getBaseContext());
+
 	}
 
 	@Override
@@ -150,13 +148,13 @@ public class BandTileEventAppActivity extends Activity {
 			if (intent.getAction() == TileEvent.ACTION_TILE_OPENED) {
 	            TileEvent tileOpenData = intent.getParcelableExtra(TileEvent.TILE_EVENT_DATA);
                 try {
-                    getConnectedBandClient();
+                    pageManager.getConnectedBandClient();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } catch (BandException e) {
                     e.printStackTrace();
                 }
-                createHomeView();
+                pageManager.createHomeView();
 				appendToUI("Tile open event received\n" + tileOpenData.toString() + "\n\n");
 			} else if (intent.getAction() == TileEvent.ACTION_TILE_BUTTON_PRESSED) {
 				TileButtonEvent buttonData = intent.getParcelableExtra(TileEvent.TILE_EVENT_DATA);
@@ -164,11 +162,11 @@ public class BandTileEventAppActivity extends Activity {
                         if (buttonData.getElementID() == 99)
                         {
                             //Play Pressed
-                            createQuestion();
+                            pageManager.createQuestion();
                         }
                         else
                         {
-                            OnAnswered(buttonData.getPageID(), buttonData.getElementID() == 21);
+                            pageManager.OnAnswered(buttonData.getPageID(), buttonData.getElementID() == 21);
 
                         }
                     }
@@ -183,19 +181,7 @@ public class BandTileEventAppActivity extends Activity {
 		}
     }
 
-    private void createHomeView() {
-        try {
-            client.getTileManager().removePages(tileId);
-            client.getTileManager().setPages(tileId,
-                    new PageData(homePageId, 0)
-                            .update(new WrappedTextBlockData(1, "Lives: " + health))
-                            .update(new TextButtonData(99, "Play")));
-        } catch (BandIOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private class StartTask extends AsyncTask<Void, Void, Boolean> {
+    public class StartTask extends AsyncTask<Void, Void, Boolean> {
 		@Override
 	    protected void onPreExecute() {
 			txtStatus.setText("");
@@ -204,9 +190,9 @@ public class BandTileEventAppActivity extends Activity {
 		@Override
 		protected Boolean doInBackground(Void... params) {
 			try {
-				if (getConnectedBandClient()) {
+				if (pageManager.getConnectedBandClient()) {
 					appendToUI("Band is connected.\n");
-					if (addTile()) {
+					if (pageManager.addTile(BandTileEventAppActivity.this)) {
 					}
 				} else {
 					appendToUI("Band isn't connected. Please make sure bluetooth is on and the band is in range.\n");
@@ -238,9 +224,9 @@ public class BandTileEventAppActivity extends Activity {
 		protected Boolean doInBackground(Void... params) {
 			appendToUI("Stopping demo and removing Band Tile\n");
 			try {
-				if (getConnectedBandClient()) {
+				if (pageManager.getConnectedBandClient()) {
 					appendToUI("Removing Tile.\n");
-					removeTile();
+					pageManager.removeTile();
 				} else {
 					appendToUI("Band isn't connected. Please make sure bluetooth is on and the band is in range.\n");
 				}
@@ -270,160 +256,26 @@ public class BandTileEventAppActivity extends Activity {
 			public void run() {
 				btnStart.setEnabled(false);
 				btnStop.setEnabled(false);
-		}
+			}
 		});
 	}
 	
 	private void appendToUI(final String string) {
 		this.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-            	txtStatus.append(string);
+			@Override
+			public void run() {
+				txtStatus.append(string);
 				scrollView.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        scrollView.smoothScrollTo(0, txtStatus.getBottom());
-                    }
+					@Override
+					public void run() {
+						scrollView.smoothScrollTo(0, txtStatus.getBottom());
+					}
 
-                });
-            }
-        });
-	}
-
-	private void removeTile() throws BandIOException, InterruptedException, BandException {
-		if (doesTileExist()) {
-			client.getTileManager().removeTile(tileId).await();
-		}
-	}
-	
-
-	private boolean doesTileExist() throws BandIOException, InterruptedException, BandException {
-		List<BandTile> tiles = client.getTileManager().getTiles().await();
-		for (BandTile tile : tiles) {
-			if (tile.getTileId().equals(tileId)) {
-				return true;
+				});
 			}
-		}
-		return false;
-	}
-	
-	private boolean addTile() throws Exception {
-		if (doesTileExist()) {
-			return true;
-		}
-		
-		/* Set the options */
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inScaled = false;
-        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-        Bitmap tileIcon = BitmapFactory.decodeResource(getBaseContext().getResources(), R.raw.b_icon, options);
-
-        BandTile tile = new BandTile.Builder(tileId, "Button Tile", tileIcon)
-			.setPageLayouts(createOneButtonLayout(), createButtonLayout())
-			.build();
-		appendToUI("Button Tile is adding ...\n");
-		if (client.getTileManager().addTile(this, tile).await()) {
-			appendToUI("Button Tile is added.\n");
-			return true;
-		} else {
-			appendToUI("Unable to add button tile to the band.\n");
-			return false;
-		}
+		});
 	}
 
-    private void createQuestion()
-    {
-        Question.generateQuestions(getBaseContext());
-        try {
-            if (currentIndex >= 3 || currentIndex < 0)
-            {
-                //Purge all pages if any
-                createHomeView();
-                return ;
-            }
-
-            updatePages();
-        }
-        catch(BandIOException e)
-        {}
-        catch(BandException e)
-        {}
-    }
-
-    private PageLayout createOneButtonLayout()
-    {
-        TextButton button1 = new TextButton(0, 5, 100, 45).setMargins(0, 5, 0, 0).setId(99).setPressedColor(Color.YELLOW);
-
-        return new PageLayout(
-                new ScrollFlowPanel(0, 0, 245, 100, FlowPanelOrientation.VERTICAL).setHorizontalAlignment(HorizontalAlignment.CENTER).setVerticalAlignment(VerticalAlignment.TOP)
-                        .addElements(
-                                new WrappedTextBlock(0, 0, 245, 202, WrappedTextBlockFont.SMALL).setId(1).setColor(Color.CYAN).setAutoHeightEnabled(true),
-                                new TextBlock(0,0,245, 50, TextBlockFont.SMALL).setId(2).setColor(Color.YELLOW).setAutoWidthEnabled(true),
-                                new FlowPanel(0,0,100,45,FlowPanelOrientation.HORIZONTAL).addElements(button1).setHorizontalAlignment(HorizontalAlignment.CENTER)));
-    }
-
-	private PageLayout createButtonLayout() {
-        TextButton button1 = new TextButton(0, 5, 100, 45).setMargins(0, 5, 0, 0).setId(12).setPressedColor(Color.GRAY);
-        TextButton button2 = new TextButton(0, 0, 100, 45).setMargins(5, 5, 0, 0).setId(21).setPressedColor(Color.GRAY);
-		return new PageLayout(
-				new ScrollFlowPanel(0, 0, 245, 100, FlowPanelOrientation.VERTICAL).setHorizontalAlignment(HorizontalAlignment.LEFT).setVerticalAlignment(VerticalAlignment.TOP)
-					.addElements(
-                            new WrappedTextBlock(0, 0, 245, 202, WrappedTextBlockFont.SMALL).setId(1).setColor(Color.WHITE).setAutoHeightEnabled(true),
-                            new FlowPanel(0,0,220,100,FlowPanelOrientation.HORIZONTAL).addElements(button1).addElements(button2)));
-	}
-	
-	private void updatePages() throws BandIOException {
-		q = Question.getAQuestion();
-		String[] options = q.getOptions();
-        client.getTileManager().setPages(tileId,
-                new PageData(questionPageId, 1)
-                        .update(new WrappedTextBlockData(1, q.getQuestionTitle()))
-                        .update(new TextButtonData(12, options[0]))
-                        .update(new TextButtonData(21, options[1])));
-	}
-
-    private void OnAnswered(UUID pageId, Boolean isCorrect) throws BandException, InterruptedException {
-        String message = (isCorrect?"Correct!!":"Wrong :(");
-        message += "\n" + q.getMessage();
-        String[] options = q.getOptions();
-
-        client.getTileManager().setPages(tileId,
-                new PageData(pageId, 1)
-                        .update(new WrappedTextBlockData(1, message))
-                        .update(new TextButtonData(12, options[0]))
-                        .update(new TextButtonData(21, options[1])));
-
-        if (isCorrect)
-        {
-            health++;
-            if (health > 2) health = 2;
-        }
-        else
-        {
-            health--;
-            if (health < 1) return ;
-        }
-        currentIndex++;
-
-        Thread.sleep(3000);
-        createQuestion();
-    }
-
-	private boolean getConnectedBandClient() throws InterruptedException, BandException {
-		if (client == null) {
-			BandInfo[] devices = BandClientManager.getInstance().getPairedBands();
-			if (devices.length == 0) {
-				appendToUI("Band isn't paired with your phone.\n");
-				return false;
-			}
-			client = BandClientManager.getInstance().create(getBaseContext(), devices[0]);
-		} else if (ConnectionState.CONNECTED == client.getConnectionState()) {
-			return true;
-		}
-		
-		appendToUI("Band is connecting...\n");
-		return ConnectionState.CONNECTED == client.connect().await();
-	}
 
 	private void handleBandException(BandException e) {
 		String exceptionMessage = "";
