@@ -15,12 +15,12 @@
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
-        android:label="@string/app_name"
+        android:label="Band Trivia"
         android:theme="@style/AppTheme" >
         <activity
             android:name="com.microsoft.band.sdk.sampleapp.BandTileEventAppActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/app_name" >
+            android:label="Band Trivia" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -33,7 +33,7 @@
         	 Tile Events, even when other components of the application are not running. -->
         <receiver 
             android:name="com.microsoft.band.sdk.sampleapp.TileEventReceiver"
-            android:label="@string/app_name"
+            android:label="Band Trivia"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
