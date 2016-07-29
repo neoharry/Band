@@ -54,9 +54,9 @@ public class PageManager{
 
     private long firstStep = -1;
 
-    private static final int MAX_HEALTH = 2;
+    private static final int MAX_HEALTH = 5;
     private static int health = MAX_HEALTH;
-
+    private int points = 0;
     private BandClient client = null;
     private Question q;
 
@@ -68,19 +68,21 @@ public class PageManager{
         this.context = context;
     }
 
-    public String GetHomeMessage()
-    {
-        if (health <=0 ) return "Run 500 mts for fuel-up";
+    public String GetHomeMessage() throws BandIOException {
+        if (health <=0 ) {
+            client.getSensorManager().registerPedometerEventListener(mPedometerEventListener);
+            return "Run 500 mts for fuel-up";
+        }
 
         return "";
     }
 
-    public void createHomeView() {
+    public void createHomeView(String message) {
         try {
             client.getTileManager().removePages(tileId);
 
             PageData data = new PageData(homePageId, 0)
-                    .update(new WrappedTextBlockData(homeStatusId, "Lives: " + health))
+                    .update(new WrappedTextBlockData(homeStatusId, message))
                     .update(new WrappedTextBlockData(homeMessageId, GetHomeMessage()))
                     .update(new TextButtonData(playButtonId, "Play"));
 
@@ -97,10 +99,10 @@ public class PageManager{
 
     public void removeTile() throws BandIOException, InterruptedException, BandException {
         if (doesTileExist()) {
+            health = MAX_HEALTH;
             client.getTileManager().removeTile(tileId).await();
         }
     }
-
 
     private boolean doesTileExist() throws BandIOException, InterruptedException, BandException {
         List<BandTile> tiles = client.getTileManager().getTiles().await();
@@ -118,7 +120,6 @@ public class PageManager{
         }
         //Question.generateQuestions(context);
 
-        client.getSensorManager().registerPedometerEventListener(mPedometerEventListener);
 		/* Set the options */
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inScaled = false;
@@ -129,12 +130,9 @@ public class PageManager{
                 .setPageLayouts(CreateHomeLayout(), CreateQuestionLayout())
                 .setPageIcons(tileIcon)
                 .build();
-        //appendToUI("Button Tile is adding ...\n");
         if (client.getTileManager().addTile(activity, tile).await()) {
-            //appendToUI("Button Tile is added.\n");
             return true;
         } else {
-            //appendToUI("Unable to add button tile to the band.\n");
             return false;
         }
     }
@@ -145,7 +143,7 @@ public class PageManager{
             if (health <= 0)
             {
                 //Purge all pages if any
-                createHomeView();
+                createHomeView("");
                 return ;
             }
 
@@ -159,29 +157,29 @@ public class PageManager{
 
     private PageLayout CreateHomeLayout()
     {
-        TextButton button1 = new TextButton(0, 5, 100, 45).setMargins(0, 5, 0, 0).setId(playButtonId).setPressedColor(Color.YELLOW);
+        TextButton button1 = new TextButton(0, 0, 100, 45).setMargins(0,0, 0, 0).setId(playButtonId).setPressedColor(Color.GREEN).setHorizontalAlignment(HorizontalAlignment.CENTER);
 
         FlowPanel healthIndicator = new FlowPanel(0, 0, 245, 30, FlowPanelOrientation.HORIZONTAL);
         for (int i = 0; i < MAX_HEALTH; i++)
         {
-            Icon icon = new Icon(0, 0, 25, 25).setId(healthIconIdStart + i);
+            Icon icon = new Icon(0, 0, 15, 15).setId(healthIconIdStart + i).setMargins(0,0,5,0);
             healthIndicator.addElements(icon);
         }
 
         return new PageLayout(
-                new ScrollFlowPanel(0, 0, 245, 100, FlowPanelOrientation.VERTICAL).setHorizontalAlignment(HorizontalAlignment.CENTER).setVerticalAlignment(VerticalAlignment.TOP)
+                new ScrollFlowPanel(0, 0, 245, 128, FlowPanelOrientation.VERTICAL).setHorizontalAlignment(HorizontalAlignment.CENTER).setVerticalAlignment(VerticalAlignment.TOP)
                         .addElements(
+                                new FlowPanel(0,0,100,45,FlowPanelOrientation.HORIZONTAL).addElements(button1).setHorizontalAlignment(HorizontalAlignment.CENTER),
                                 healthIndicator,
                                 new WrappedTextBlock(0, 0, 245, 202, WrappedTextBlockFont.SMALL).setId(homeStatusId).setColor(Color.GREEN).setAutoHeightEnabled(true),
-                                new WrappedTextBlock(0, 0, 245, 202, WrappedTextBlockFont.SMALL).setId(homeMessageId).setColor(Color.YELLOW).setAutoHeightEnabled(true),
-                                new FlowPanel(0,0,100,45,FlowPanelOrientation.HORIZONTAL).addElements(button1).setHorizontalAlignment(HorizontalAlignment.CENTER)));
+                                new WrappedTextBlock(0, 0, 245, 202, WrappedTextBlockFont.SMALL).setId(homeMessageId).setColor(Color.YELLOW).setAutoHeightEnabled(true)));
     }
 
     private PageLayout CreateQuestionLayout() {
         TextButton button1 = new TextButton(0, 5, 245, 45).setMargins(0, 15, 0, 0).setId(optionLeftId).setPressedColor(Color.GRAY).setHorizontalAlignment(HorizontalAlignment.CENTER);
         TextButton button2 = new TextButton(0, 0, 245, 45).setMargins(0, 15, 0, 0).setId(optionRightId).setPressedColor(Color.GRAY).setHorizontalAlignment(HorizontalAlignment.CENTER);
 
-        TextButton skipButton = new TextButton(0, 0, 100, 45).setMargins(115, 15, 0, 0).setId(skipButtonId).setPressedColor(Color.GRAY).setHorizontalAlignment(HorizontalAlignment.CENTER);
+        TextButton skipButton = new TextButton(0, 0, 100, 45).setMargins(115, 15, 0, 0).setId(skipButtonId).setPressedColor(Color.RED).setHorizontalAlignment(HorizontalAlignment.CENTER);
 
         return new PageLayout(
                 new ScrollFlowPanel(0, 0, 245, 100, FlowPanelOrientation.VERTICAL).setHorizontalAlignment(HorizontalAlignment.LEFT).setVerticalAlignment(VerticalAlignment.TOP)
@@ -199,14 +197,20 @@ public class PageManager{
                         .update(new WrappedTextBlockData(questionTextId, q.getQuestionTitle()))
                         .update(new TextButtonData(optionLeftId, options[0]))
                         .update(new TextButtonData(optionRightId, options[1]))
-                        .update(new TextButtonData(skipButtonId, "Next")));
+                        .update(new TextButtonData(skipButtonId, "Skip")));
     }
 
-    private void UpdateHealth(int newValue)
+    private void UpdateHealth(int newValue, String message)
     {
-        if (newValue < 0 || newValue > MAX_HEALTH)
-            return;
-        health = newValue;
+        if (newValue >=0 && newValue <= MAX_HEALTH)
+            health = newValue;
+
+        createHomeView(message);
+    }
+
+    private void UpdatePoints(int newValue)
+    {
+        points = newValue < 0 ? 0 : newValue;
     }
 
     public void OnAnswered(UUID pageId, Boolean isCorrect) throws BandException, InterruptedException {
@@ -214,20 +218,22 @@ public class PageManager{
         message += "\n" + q.getMessage();
         String[] options = q.getOptions();
 
-        client.getTileManager().setPages(tileId,
+        /*client.getTileManager().setPages(tileId,
                 new PageData(pageId, 1)
                         .update(new WrappedTextBlockData(questionTextId, message))
                         .update(new TextButtonData(optionLeftId, options[0]))
                         .update(new TextButtonData(optionRightId, options[1]))
                         .update(new TextButtonData(skipButtonId, "Next")));
-
+        */
         if (isCorrect)
         {
-            UpdateHealth(health+1);
+            UpdatePoints(10);
+            UpdateHealth(health+1, message);
         }
         else
         {
-            UpdateHealth(health-1);
+            UpdatePoints(-5);
+            UpdateHealth(health-1, message);
         }
     }
 
@@ -240,8 +246,7 @@ public class PageManager{
         }
         else if (buttonData.getElementID() == skipButtonId)
         {
-            UpdateHealth(health-1);
-            createQuestion();
+            UpdateHealth(health-1, "");
         }
         else
         {
@@ -266,8 +271,7 @@ public class PageManager{
                 if (event.getTotalSteps() - firstStep > 5) {
                     firstStep = -1;
                     UnregisterPedometer();
-                    UpdateHealth(2);
-
+                    UpdateHealth(MAX_HEALTH, "Catch'em !!");
                 }
 
             }

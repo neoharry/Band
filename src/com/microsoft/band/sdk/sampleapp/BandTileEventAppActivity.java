@@ -218,8 +218,13 @@ public class BandTileEventAppActivity extends Activity {
                 } catch (BandException e) {
                     e.printStackTrace();
                 }
+<<<<<<< .merge_file_a08088
                 pageManager.createHomeView();
 				//appendToUI("Tile open event received\n" + tileOpenData.toString() + "\n\n");
+=======
+                pageManager.createHomeView("");
+				appendToUI("Tile open event received\n" + tileOpenData.toString() + "\n\n");
+>>>>>>> .merge_file_a06556
 			} else if (intent.getAction() == TileEvent.ACTION_TILE_BUTTON_PRESSED) {
 				TileButtonEvent buttonData = intent.getParcelableExtra(TileEvent.TILE_EVENT_DATA);
 				pageManager.OnButtonClicked(buttonData);
