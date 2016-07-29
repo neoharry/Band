@@ -116,7 +116,7 @@ public class PageManager{
         if (doesTileExist()) {
             return true;
         }
-        Question.generateQuestions(context);
+        //Question.generateQuestions(context);
 
         client.getSensorManager().registerPedometerEventListener(mPedometerEventListener);
 		/* Set the options */

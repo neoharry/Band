@@ -60,7 +60,7 @@ public class Question {
         this.tags = tags;
     }
 
-    public static void generateQuestions(Context context) {
+    public static void generateQuestions(Context context, List<Category> categories) {
         try {
             InputStream inputStream = context.getResources().openRawResource(R.raw.questions);
             InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
@@ -68,7 +68,7 @@ public class Question {
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 String[] input = line.split(",");
-                parseQuestionFromInput(input);
+                parseQuestionFromInput(input, categories);
             }
         } catch (IOException e) {
             Log.e("generateQuestions", e.getMessage());
@@ -104,7 +104,7 @@ public class Question {
         return getCorrectAnswer().equalsIgnoreCase(getOptions()[optionIndex]);
     }
 
-    private static void parseQuestionFromInput(String[] input) {
+    private static void parseQuestionFromInput(String[] input, List<Category> categories) {
         if (input != null && input.length != 8) {
             Log.e("parseQuestionFromInput", "Invalid input");
         } else {
@@ -123,7 +123,12 @@ public class Question {
                     Category.valueOf(input[6]), /* category */
                     tags    /*tags */
             );
-            questions.add(q);
+            if (categories.contains(q.category)) {
+                questions.add(q);
+                Log.d("added q", q.category.toString());
+            }
+            else
+                Log.d("ddidn't add q", q.category.toString());
         }
     }
 }

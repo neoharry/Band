@@ -53,9 +53,11 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import com.microsoft.band.tiles.pages.ScrollFlowPanel;
@@ -80,14 +82,77 @@ public class BandTileEventAppActivity extends Activity {
 	private ScrollView scrollView;
 
 	private PageManager pageManager;
+    private List<Question.Category> categories = new ArrayList<Question.Category>();
+
+    public void onCheckboxClicked(View view) {
+        // Is the view now checked?
+        boolean checked = ((CheckBox) view).isChecked();
+
+        // Check which checkbox was clicked
+        switch(view.getId()) {
+            case R.id.checkbox_sports:
+                if (checked) {
+                    categories.add(Question.Category.Sports);
+                    Log.d("onCheckBoxClicked", "Sports");
+                } else {
+                    if (categories.contains(Question.Category.Sports)) {
+                        categories.remove(Question.Category.Sports);
+                        Log.d("onCheckBoxClicked", "Removed Sports");
+                    }
+                }
+                break;
+            case R.id.checkbox_history:
+                if (checked) {
+                    categories.add(Question.Category.History);
+                    Log.d("onCheckBoxClicked", "History");
+                } else {
+                    if (categories.contains(Question.Category.History)) {
+                        categories.remove(Question.Category.History);
+                        Log.d("onCheckBoxClicked", "Removed History");
+                    }
+                }
+                break;
+            case R.id.checkbox_science:
+                if (checked) {
+                    categories.add(Question.Category.Science);
+                    Log.d("onCheckBoxClicked", "Science");
+                } else {
+                    if (categories.contains(Question.Category.Science)) {
+                        categories.remove(Question.Category.Science);
+                        Log.d("onCheckBoxClicked", "Removed Science");
+                    }
+                }
+                break;
+            case R.id.checkbox_tvShows:
+                if (checked) {
+                    categories.add(Question.Category.TVShows);
+                    Log.d("onCheckBoxClicked", "TVShows");
+                } else {
+                    if (categories.contains(Question.Category.TVShows)) {
+                        categories.remove(Question.Category.TVShows);
+                        Log.d("onCheckBoxClicked", "Removed TVShows");
+                    }
+                }
+                break;
+            default:
+                // By default all categories are selected
+                if (categories.size() <= 0)
+                {
+                    categories.add(Question.Category.Sports);
+                    categories.add(Question.Category.History);
+                    categories.add(Question.Category.Science);
+                    categories.add(Question.Category.TVShows);
+                }
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        txtStatus = (TextView) findViewById(R.id.txtStatus);
-		scrollView = (ScrollView) findViewById(R.id.svTest);
+        //txtStatus = (TextView) findViewById(R.id.txtStatus);
+		//scrollView = (ScrollView) findViewById(R.id.svTest);
         
 		btnStart = (Button) findViewById(R.id.startButton);
         btnStart.setOnClickListener(new OnClickListener() {
@@ -125,7 +190,6 @@ public class BandTileEventAppActivity extends Activity {
 			processIntent(getIntent());
 		}
 	}
-	
 
     @Override
     protected void onDestroy() {
@@ -155,14 +219,14 @@ public class BandTileEventAppActivity extends Activity {
                     e.printStackTrace();
                 }
                 pageManager.createHomeView();
-				appendToUI("Tile open event received\n" + tileOpenData.toString() + "\n\n");
+				//appendToUI("Tile open event received\n" + tileOpenData.toString() + "\n\n");
 			} else if (intent.getAction() == TileEvent.ACTION_TILE_BUTTON_PRESSED) {
 				TileButtonEvent buttonData = intent.getParcelableExtra(TileEvent.TILE_EVENT_DATA);
 				pageManager.OnButtonClicked(buttonData);
-				appendToUI("Button 1 Pressed\n\n");
+				//appendToUI("Button 1 Pressed\n\n");
 			} else if (intent.getAction() == TileEvent.ACTION_TILE_CLOSED) {
 				TileEvent tileCloseData = intent.getParcelableExtra(TileEvent.TILE_EVENT_DATA);
-				appendToUI("Tile close event received\n" + tileCloseData.toString() + "\n\n");
+				//appendToUI("Tile close event received\n" + tileCloseData.toString() + "\n\n");
 			}
 		}
     }
@@ -170,25 +234,26 @@ public class BandTileEventAppActivity extends Activity {
     public class StartTask extends AsyncTask<Void, Void, Boolean> {
 		@Override
 	    protected void onPreExecute() {
-			txtStatus.setText("");
+		//	txtStatus.setText("");
 	    }
 
 		@Override
 		protected Boolean doInBackground(Void... params) {
 			try {
 				if (pageManager.getConnectedBandClient()) {
-					appendToUI("Band is connected.\n");
+					//appendToUI("Band is connected.\n");
+                    Question.generateQuestions(getBaseContext(), categories);
 					if (pageManager.addTile(BandTileEventAppActivity.this)) {
 					}
 				} else {
-					appendToUI("Band isn't connected. Please make sure bluetooth is on and the band is in range.\n");
+					//appendToUI("Band isn't connected. Please make sure bluetooth is on and the band is in range.\n");
 					return false;
 				}
 			} catch (BandException e) {
 				handleBandException(e);
 				return false;
 			} catch (Exception e) {
-				appendToUI(e.getMessage());
+				//appendToUI(e.getMessage());
 				return false;
 			}
 
@@ -208,19 +273,19 @@ public class BandTileEventAppActivity extends Activity {
 	private class StopTask extends AsyncTask<Void, Void, Boolean> {
 		@Override
 		protected Boolean doInBackground(Void... params) {
-			appendToUI("Stopping demo and removing Band Tile\n");
+			//appendToUI("Stopping demo and removing Band Tile\n");
 			try {
 				if (pageManager.getConnectedBandClient()) {
-					appendToUI("Removing Tile.\n");
+					//appendToUI("Removing Tile.\n");
 					pageManager.removeTile();
 				} else {
-					appendToUI("Band isn't connected. Please make sure bluetooth is on and the band is in range.\n");
+					//appendToUI("Band isn't connected. Please make sure bluetooth is on and the band is in range.\n");
 				}
 			} catch (BandException e) {
 				handleBandException(e);
 				return false;
 			} catch (Exception e) {
-				appendToUI(e.getMessage());
+				//appendToUI(e.getMessage());
 				return false;
 			}
 			
@@ -230,7 +295,7 @@ public class BandTileEventAppActivity extends Activity {
 		@Override
 		protected void onPostExecute(Boolean result) {
 			if (result) {
-				appendToUI("Stop completed.\n");
+				//appendToUI("Stop completed.\n");
 			}
 			btnStart.setEnabled(true);
 		}
@@ -245,7 +310,7 @@ public class BandTileEventAppActivity extends Activity {
 			}
 		});
 	}
-	
+	/*
 	private void appendToUI(final String string) {
 		this.runOnUiThread(new Runnable() {
 			@Override
@@ -260,7 +325,7 @@ public class BandTileEventAppActivity extends Activity {
 				});
 			}
 		});
-	}
+	}*/
 
 
 	private void handleBandException(BandException e) {
@@ -282,6 +347,6 @@ public class BandTileEventAppActivity extends Activity {
 			exceptionMessage = "Unknown error occured: " + e.getMessage() + "\n";
 			break;
 		}
-		appendToUI(exceptionMessage);
+		//appendToUI(exceptionMessage);
 	}
 }
