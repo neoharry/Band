@@ -88,8 +88,13 @@ public class PageManager{
 
             for (int i = 0; i < health; i++)
             {
-                data.update(new IconData(healthIconIdStart+i,0));
+                data.update(new IconData(healthIconIdStart+i,2));
             }
+            for (int i = health; i <= MAX_HEALTH; i++)
+            {
+                data.update(new IconData(healthIconIdStart+i,3));
+            }
+
             client.getTileManager().setPages(tileId, data);
 
         } catch (BandIOException e) {
@@ -125,10 +130,12 @@ public class PageManager{
         options.inScaled = false;
         options.inPreferredConfig = Bitmap.Config.ARGB_8888;
         Bitmap tileIcon = BitmapFactory.decodeResource(context.getResources(), R.raw.b_icon, options);
+        Bitmap healthIcon = BitmapFactory.decodeResource(context.getResources(), R.raw.a_icon, options);
+        Bitmap healthIconEmpty = BitmapFactory.decodeResource(context.getResources(), R.raw.c_icon, options);
 
         BandTile tile = new BandTile.Builder(tileId, "Button Tile", tileIcon)
                 .setPageLayouts(CreateHomeLayout(), CreateQuestionLayout())
-                .setPageIcons(tileIcon)
+                .setPageIcons(healthIcon, healthIconEmpty)
                 .build();
         if (client.getTileManager().addTile(activity, tile).await()) {
             return true;
@@ -159,10 +166,10 @@ public class PageManager{
     {
         TextButton button1 = new TextButton(0, 0, 100, 45).setMargins(0,0, 0, 0).setId(playButtonId).setPressedColor(Color.GREEN).setHorizontalAlignment(HorizontalAlignment.CENTER);
 
-        FlowPanel healthIndicator = new FlowPanel(0, 0, 245, 30, FlowPanelOrientation.HORIZONTAL);
+        FlowPanel healthIndicator = new FlowPanel(0, 0, 245, 30, FlowPanelOrientation.HORIZONTAL).setHorizontalAlignment(HorizontalAlignment.CENTER);
         for (int i = 0; i < MAX_HEALTH; i++)
         {
-            Icon icon = new Icon(0, 0, 15, 15).setId(healthIconIdStart + i).setMargins(0,0,5,0);
+            Icon icon = new Icon(0, 0, 17, 15).setId(healthIconIdStart + i).setMargins(0,15,15,0);
             healthIndicator.addElements(icon);
         }
 
@@ -182,7 +189,7 @@ public class PageManager{
         TextButton skipButton = new TextButton(0, 0, 100, 45).setMargins(115, 15, 0, 0).setId(skipButtonId).setPressedColor(Color.RED).setHorizontalAlignment(HorizontalAlignment.CENTER);
 
         return new PageLayout(
-                new ScrollFlowPanel(0, 0, 245, 100, FlowPanelOrientation.VERTICAL).setHorizontalAlignment(HorizontalAlignment.LEFT).setVerticalAlignment(VerticalAlignment.TOP)
+                new ScrollFlowPanel(0, 0, 245, 120, FlowPanelOrientation.VERTICAL).setHorizontalAlignment(HorizontalAlignment.LEFT).setVerticalAlignment(VerticalAlignment.TOP)
                         .addElements(
                                 new WrappedTextBlock(0, 0, 245, 202, WrappedTextBlockFont.SMALL).setId(questionTextId).setColor(Color.WHITE).setAutoHeightEnabled(true),
                                 new FlowPanel(0,0,245,120,FlowPanelOrientation.VERTICAL).addElements(button1, button2).setHorizontalAlignment(HorizontalAlignment.CENTER),
@@ -271,7 +278,7 @@ public class PageManager{
                 if (event.getTotalSteps() - firstStep > 5) {
                     firstStep = -1;
                     UnregisterPedometer();
-                    UpdateHealth(MAX_HEALTH, "Catch'em !!");
+                    UpdateHealth(MAX_HEALTH, "Fuelled up!!");
                 }
 
             }
