@@ -154,7 +154,7 @@ public class BandTileEventAppActivity extends Activity {
                 } catch (BandException e) {
                     e.printStackTrace();
                 }
-                pageManager.createHomeView();
+                pageManager.createHomeView("");
 				appendToUI("Tile open event received\n" + tileOpenData.toString() + "\n\n");
 			} else if (intent.getAction() == TileEvent.ACTION_TILE_BUTTON_PRESSED) {
 				TileButtonEvent buttonData = intent.getParcelableExtra(TileEvent.TILE_EVENT_DATA);
