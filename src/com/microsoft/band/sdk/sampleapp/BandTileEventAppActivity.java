@@ -47,6 +47,7 @@ import com.microsoft.band.tiles.pages.TextButton;
 import com.microsoft.band.tiles.pages.TextButtonData;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
